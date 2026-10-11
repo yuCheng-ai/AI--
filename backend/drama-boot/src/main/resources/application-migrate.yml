@@ -1,0 +1,21 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    username: drama_owner
+    password: ${DRAMA_DB_PASSWORD}
+  flyway:
+    enabled: true
+  session:
+    jdbc:
+      cleanup-cron: '-'
+drama:
+  runtime:
+    role: migrate
+  bootstrap:
+    enabled: false
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

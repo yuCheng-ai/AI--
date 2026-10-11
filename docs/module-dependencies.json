@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "description": "业务模块的直接依赖白名单；boot 为组装入口，不属于业务依赖图。跨模块仅访问 api、events，以及明确开放的 spi。",
+  "modules": {
+    "kernel": [],
+    "workspace": ["kernel"],
+    "jobs": ["kernel"],
+    "models": ["kernel", "workspace"],
+    "media": ["kernel", "workspace", "jobs"],
+    "assets": ["kernel", "workspace", "media", "jobs"],
+    "content": ["kernel", "workspace", "assets", "media", "jobs"],
+    "usage": ["kernel", "workspace"],
+    "generation": ["kernel", "workspace", "models", "media", "jobs", "usage"],
+    "editing": ["kernel", "workspace", "media", "jobs", "usage"],
+    "workbench": ["kernel", "workspace", "content", "assets", "generation", "editing", "media", "models", "usage", "jobs"]
+  }
+}

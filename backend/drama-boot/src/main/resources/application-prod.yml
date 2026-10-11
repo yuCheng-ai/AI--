@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${DRAMA_DB_URL}
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+logging:
+  structured:
+    format:
+      console: ecs
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+drama:
+  docs:
+    public: false
+  bootstrap:
+    enabled: false
+  storage:
+    local:
+      root: ${DRAMA_STORAGE_ROOT}

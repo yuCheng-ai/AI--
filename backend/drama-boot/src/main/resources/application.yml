@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: yucheng-drama
+  jackson:
+    time-zone: UTC
+  datasource:
+    url: ${DRAMA_DB_URL:jdbc:postgresql://localhost:15432/drama}
+    username: drama_app
+    password: ${DRAMA_DB_APP_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DRAMA_DB_POOL_MAX:10}
+      minimum-idle: ${DRAMA_DB_POOL_MIN:2}
+      connection-timeout: 10000
+      connection-init-sql: SET TIME ZONE 'UTC'
+  flyway:
+    enabled: false
+    locations: classpath:db/migration/boot,classpath:db/migration/workspace,classpath:db/migration/content,classpath:db/migration/media
+    default-schema: public
+    clean-disabled: true
+    validate-migration-naming: true
+  session:
+    timeout: 8h
+    jdbc:
+      initialize-schema: never
+      table-name: public.spring_session
+  servlet:
+    multipart:
+      max-file-size: ${drama.storage.max-file-size}
+      max-request-size: ${DRAMA_UPLOAD_MAX_REQUEST_SIZE:101MB}
+      file-size-threshold: 0B
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+server:
+  port: ${DRAMA_HTTP_PORT:18080}
+  address: ${DRAMA_HTTP_ADDRESS:127.0.0.1}
+  shutdown: graceful
+  forward-headers-strategy: none
+  servlet:
+    session:
+      cookie:
+        name: DRAMA_SESSION
+        http-only: true
+        secure: ${DRAMA_COOKIE_SECURE:false}
+        same-site: lax
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  global-config:
+    banner: false
+  configuration:
+    map-underscore-to-camel-case: true
+    arg-name-based-constructor-auto-mapping: true
+    cache-enabled: false
+    local-cache-scope: STATEMENT
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+springdoc:
+  api-docs:
+    enabled: ${DRAMA_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${DRAMA_DOCS_ENABLED:true}
+    path: /swagger-ui.html
+    csrf:
+      enabled: true
+      cookie-name: XSRF-TOKEN
+      header-name: X-XSRF-TOKEN
+    display-request-duration: true
+    disable-swagger-default-url: true
+    operations-sorter: alpha
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+logging:
+  level:
+    root: INFO
+    com.yucheng.drama: INFO
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX,UTC} %-5level [%thread] trace=%X{traceId:-} %logger{40} - %msg %kvp%n"
+drama:
+  runtime:
+    role: api
+  docs:
+    public: ${DRAMA_DOCS_PUBLIC:true}
+  bootstrap:
+    enabled: ${DRAMA_BOOTSTRAP_ENABLED:false}
+    username: ${DRAMA_BOOTSTRAP_USERNAME:}
+    password: ${DRAMA_BOOTSTRAP_PASSWORD:}
+  storage:
+    max-file-size: ${DRAMA_UPLOAD_MAX_FILE_SIZE:100MB}
+    local:
+      root: ${DRAMA_STORAGE_ROOT:./.local/data/media}
+  sql:
+    slow-threshold-ms: ${DRAMA_SQL_SLOW_THRESHOLD_MS:300}

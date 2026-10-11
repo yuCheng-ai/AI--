@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yucheng.drama.content.internal.infrastructure.persistence.ContentMapper">
+  <sql id="projectColumns">p.id::text AS id, p.workspace_id::text AS workspace_id, p.name, p.description,
+    p.aspect_ratio, p.revision, p.created_at, p.updated_at</sql>
+  <sql id="shotColumns">s.id::text AS id, s.workspace_id::text AS workspace_id, s.project_id::text AS project_id,
+    s.shot_number, r.title, r.description, r.dialogue, r.duration_seconds, r.revision, s.created_at, r.created_at AS updated_at</sql>
+  <select id="listProjects" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ProjectRow">
+    SELECT <include refid="projectColumns"/> FROM content.project p
+    WHERE p.workspace_id = #{workspaceId} AND p.archived_at IS NULL
+    <if test="cursorTime != null">AND (p.created_at, p.id) &gt; (#{cursorTime}, #{cursorId})</if>
+    ORDER BY p.created_at, p.id LIMIT #{limit}
+  </select>
+  <select id="findProject" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ProjectRow">
+    SELECT <include refid="projectColumns"/> FROM content.project p
+    WHERE p.workspace_id = #{workspaceId} AND p.id = #{projectId} AND p.archived_at IS NULL
+  </select>
+  <select id="lockProject" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ProjectRow">
+    SELECT <include refid="projectColumns"/> FROM content.project p
+    WHERE p.workspace_id = #{workspaceId} AND p.id = #{projectId} AND p.archived_at IS NULL FOR UPDATE
+  </select>
+  <insert id="insertProject">
+    INSERT INTO content.project(id, workspace_id, name, description, aspect_ratio, created_by, updated_by)
+    VALUES (#{id}, #{workspaceId}, #{name}, #{description}, #{aspectRatio}, #{actorId}, #{actorId})
+  </insert>
+  <update id="updateProject">
+    UPDATE content.project SET name = #{name}, description = #{description}, aspect_ratio = #{aspectRatio},
+      revision = revision + 1, updated_at = CURRENT_TIMESTAMP, updated_by = #{actorId}
+    WHERE workspace_id = #{workspaceId} AND id = #{projectId}
+      AND revision = #{expectedRevision} AND archived_at IS NULL
+  </update>
+  <update id="archiveProject">
+    UPDATE content.project SET archived_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
+      revision = revision + 1, updated_by = #{actorId}
+    WHERE workspace_id = #{workspaceId} AND id = #{projectId}
+      AND revision = #{expectedRevision} AND archived_at IS NULL
+  </update>
+  <select id="listShots" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ShotRow">
+    SELECT <include refid="shotColumns"/> FROM content.shot s
+    INNER JOIN content.shot_revision r
+      ON r.workspace_id = s.workspace_id AND r.shot_id = s.id AND r.revision = s.current_revision
+    WHERE s.workspace_id = #{workspaceId} AND s.project_id = #{projectId} AND s.shot_number &gt; #{afterNumber}
+    ORDER BY s.shot_number LIMIT #{limit}
+  </select>
+  <select id="findShot" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ShotRow">
+    SELECT <include refid="shotColumns"/> FROM content.shot s
+    INNER JOIN content.shot_revision r
+      ON r.workspace_id = s.workspace_id AND r.shot_id = s.id AND r.revision = s.current_revision
+    WHERE s.workspace_id = #{workspaceId} AND s.id = #{shotId}
+  </select>
+  <select id="findShotRevision" resultType="com.yucheng.drama.content.internal.infrastructure.persistence.ShotRow">
+    SELECT <include refid="shotColumns"/> FROM content.shot s
+    INNER JOIN content.shot_revision r ON r.workspace_id = s.workspace_id AND r.shot_id = s.id
+    WHERE s.workspace_id = #{workspaceId} AND s.id = #{shotId} AND r.revision = #{revision}
+  </select>
+  <select id="nextShotNumber" resultType="int">
+    SELECT COALESCE(MAX(shot_number), 0) + 1 FROM content.shot
+    WHERE workspace_id = #{workspaceId} AND project_id = #{projectId}
+  </select>
+  <insert id="insertShot">
+    INSERT INTO content.shot(id, workspace_id, project_id, shot_number, current_revision, created_by, updated_by)
+    VALUES (#{id}, #{workspaceId}, #{projectId}, #{shotNumber}, 1, #{actorId}, #{actorId})
+  </insert>
+  <insert id="insertShotRevision">
+    INSERT INTO content.shot_revision(workspace_id, shot_id, revision, title, description, dialogue, duration_seconds, created_by)
+    VALUES (#{workspaceId}, #{shotId}, #{revision}, #{title}, #{description}, #{dialogue}, #{durationSeconds}, #{actorId})
+  </insert>
+  <update id="advanceShotRevision">
+    UPDATE content.shot SET current_revision = current_revision + 1, updated_at = CURRENT_TIMESTAMP, updated_by = #{actorId}
+    WHERE workspace_id = #{workspaceId} AND id = #{shotId} AND current_revision = #{expectedRevision}
+  </update>
+</mapper>

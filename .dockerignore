@@ -1,0 +1,7 @@
+.git
+.env
+.local
+.idea
+**/src/test
+**/node_modules
+**/dist

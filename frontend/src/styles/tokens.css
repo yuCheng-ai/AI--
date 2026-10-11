@@ -1,0 +1,18 @@
+:root {
+  color-scheme: dark;
+  --bg: #151617;
+  --surface: #1b1c1e;
+  --surface-raised: #222426;
+  --surface-hover: #2a2d2f;
+  --line: #303437;
+  --line-soft: #24282a;
+  --text: #eeeeec;
+  --muted: #9b9fa2;
+  --faint: #757c80;
+  --accent: #ed9078;
+  --accent-hover: #f6a18c;
+  --accent-text: #29201d;
+  --danger: #ed9a92;
+  --radius: 10px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}

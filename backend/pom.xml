@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>4.1.1</version><relativePath/></parent>
+  <groupId>com.yucheng.drama</groupId><artifactId>drama-parent</artifactId><version>0.1.0-SNAPSHOT</version><packaging>pom</packaging>
+  <name>Yucheng Drama Backend</name>
+  <properties><java.version>25</java.version><mybatis-plus.version>3.5.17</mybatis-plus.version><springdoc.version>3.1.1</springdoc.version><maven.compiler.parameters>true</maven.compiler.parameters><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <modules>
+    <module>drama-kernel</module>
+    <module>drama-workspace</module>
+    <module>drama-jobs</module>
+    <module>drama-models</module>
+    <module>drama-media</module>
+    <module>drama-assets</module>
+    <module>drama-content</module>
+    <module>drama-usage</module>
+    <module>drama-generation</module>
+    <module>drama-editing</module>
+    <module>drama-workbench</module>
+    <module>drama-boot</module>
+  </modules>
+  <dependencyManagement><dependencies>
+    <dependency><groupId>com.baomidou</groupId><artifactId>mybatis-plus-bom</artifactId><version>${mybatis-plus.version}</version><type>pom</type><scope>import</scope></dependency>
+    <dependency><groupId>org.springdoc</groupId><artifactId>springdoc-openapi-starter-webmvc-ui</artifactId><version>${springdoc.version}</version></dependency>
+  </dependencies></dependencyManagement>
+  <build><pluginManagement><plugins>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><version>3.6.3</version><executions><execution><id>java-and-maven</id><goals><goal>enforce</goal></goals><configuration><rules><requireJavaVersion><version>[25,26)</version></requireJavaVersion><requireMavenVersion><version>[3.9.9,4)</version></requireMavenVersion></rules></configuration></execution></executions></plugin>
+  </plugins></pluginManagement><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId></plugin></plugins></build>
+</project>

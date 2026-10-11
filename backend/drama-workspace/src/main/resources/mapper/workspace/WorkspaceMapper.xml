@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yucheng.drama.workspace.internal.infrastructure.persistence.WorkspaceMapper">
+  <select id="findUserByUsername" resultType="com.yucheng.drama.workspace.internal.infrastructure.persistence.UserRow">
+    SELECT id::text AS id, username, password_hash, enabled
+    FROM workspace.app_user WHERE username = #{username}
+  </select>
+  <select id="findUserById" resultType="com.yucheng.drama.workspace.internal.infrastructure.persistence.UserRow">
+    SELECT id::text AS id, username, password_hash, enabled
+    FROM workspace.app_user WHERE id = #{userId}
+  </select>
+  <insert id="insertUser">
+    INSERT INTO workspace.app_user(id, username, password_hash, enabled)
+    VALUES (#{id}, #{username}, #{passwordHash}, TRUE)
+    ON CONFLICT (username) DO NOTHING
+  </insert>
+  <select id="listForActor" resultType="com.yucheng.drama.workspace.internal.infrastructure.persistence.WorkspaceRow">
+    SELECT w.id::text AS id, w.name, m.role, w.revision, w.created_at, w.updated_at
+    FROM workspace.workspace w
+    INNER JOIN workspace.membership m ON m.workspace_id = w.id
+    INNER JOIN workspace.app_user u ON u.id = m.user_id
+    WHERE m.user_id = #{actorId} AND u.enabled = TRUE AND w.archived_at IS NULL
+    <if test="cursorTime != null">AND (w.created_at, w.id) &gt; (#{cursorTime}, #{cursorId})</if>
+    ORDER BY w.created_at, w.id LIMIT #{limit}
+  </select>
+  <select id="findForActor" resultType="com.yucheng.drama.workspace.internal.infrastructure.persistence.WorkspaceRow">
+    SELECT w.id::text AS id, w.name, m.role, w.revision, w.created_at, w.updated_at
+    FROM workspace.workspace w
+    INNER JOIN workspace.membership m ON m.workspace_id = w.id
+    INNER JOIN workspace.app_user u ON u.id = m.user_id
+    WHERE w.id = #{workspaceId} AND m.user_id = #{actorId}
+      AND u.enabled = TRUE AND w.archived_at IS NULL
+  </select>
+  <select id="findRole" resultType="string">
+    SELECT m.role
+    FROM workspace.membership m
+    INNER JOIN workspace.workspace w ON w.id = m.workspace_id
+    INNER JOIN workspace.app_user u ON u.id = m.user_id
+    WHERE m.workspace_id = #{workspaceId} AND m.user_id = #{actorId}
+      AND u.enabled = TRUE AND w.archived_at IS NULL
+  </select>
+  <insert id="insertWorkspace">
+    INSERT INTO workspace.workspace(id, name, created_by) VALUES (#{id}, #{name}, #{actorId})
+  </insert>
+  <insert id="insertAdminMembership">
+    INSERT INTO workspace.membership(workspace_id, user_id, role) VALUES (#{workspaceId}, #{actorId}, 'ADMIN')
+  </insert>
+  <update id="renameWorkspace">
+    UPDATE workspace.workspace SET name = #{name}, revision = revision + 1, updated_at = CURRENT_TIMESTAMP
+    WHERE id = #{workspaceId} AND revision = #{expectedRevision} AND archived_at IS NULL
+  </update>
+  <update id="archiveWorkspace">
+    UPDATE workspace.workspace SET archived_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP, revision = revision + 1
+    WHERE id = #{workspaceId} AND revision = #{expectedRevision} AND archived_at IS NULL
+  </update>
+</mapper>

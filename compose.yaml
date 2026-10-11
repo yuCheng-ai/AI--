@@ -1,0 +1,112 @@
+name: drama-foundation
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-runtime: &runtime
+  image: drama-foundation-api:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+  user: "${DRAMA_UID:-10001}:${DRAMA_GID:-10001}"
+  logging: *logging
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    command: ["postgres", "-c", "timezone=UTC", "-c", "log_timezone=UTC"]
+    logging: *logging
+    environment:
+      POSTGRES_DB: drama
+      POSTGRES_USER: drama_owner
+      POSTGRES_PASSWORD: ${DRAMA_DB_PASSWORD:?Run scripts/dev-init.sh first}
+      DRAMA_DB_APP_PASSWORD: ${DRAMA_DB_APP_PASSWORD:?Run scripts/dev-init.sh first}
+    ports:
+      - "127.0.0.1:15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./infra/postgres/10-create-app-user.sh:/docker-entrypoint-initdb.d/10-create-app-user.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drama_owner -d drama"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+  migrate:
+    <<: *runtime
+    profiles: [app]
+    environment:
+      DRAMA_DB_URL: jdbc:postgresql://postgres:5432/drama
+      DRAMA_DB_PASSWORD: ${DRAMA_DB_PASSWORD:?Run scripts/dev-init.sh first}
+      DRAMA_BOOTSTRAP_ENABLED: "false"
+    command: ["--spring.profiles.active=migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *runtime
+    profiles: [app]
+    environment:
+      DRAMA_DB_URL: jdbc:postgresql://postgres:5432/drama
+      DRAMA_DB_APP_PASSWORD: ${DRAMA_DB_APP_PASSWORD:?Run scripts/dev-init.sh first}
+      DRAMA_HTTP_ADDRESS: 0.0.0.0
+      DRAMA_HTTP_PORT: "18080"
+      DRAMA_STORAGE_ROOT: /app/data/media
+      DRAMA_BOOTSTRAP_ENABLED: ${DRAMA_BOOTSTRAP_ENABLED:-true}
+      DRAMA_BOOTSTRAP_USERNAME: ${DRAMA_BOOTSTRAP_USERNAME:-}
+      DRAMA_BOOTSTRAP_PASSWORD: ${DRAMA_BOOTSTRAP_PASSWORD:-}
+      DRAMA_UPLOAD_MAX_FILE_SIZE: ${DRAMA_UPLOAD_MAX_FILE_SIZE:-100MB}
+      DRAMA_UPLOAD_MAX_REQUEST_SIZE: ${DRAMA_UPLOAD_MAX_REQUEST_SIZE:-101MB}
+      DRAMA_DB_POOL_MAX: ${DRAMA_DB_POOL_MAX:-10}
+      DRAMA_DB_POOL_MIN: ${DRAMA_DB_POOL_MIN:-2}
+      DRAMA_SQL_SLOW_THRESHOLD_MS: ${DRAMA_SQL_SLOW_THRESHOLD_MS:-300}
+      DRAMA_DOCS_ENABLED: ${DRAMA_DOCS_ENABLED:-true}
+      DRAMA_DOCS_PUBLIC: ${DRAMA_DOCS_PUBLIC:-true}
+      DRAMA_COOKIE_SECURE: ${DRAMA_COOKIE_SECURE:-false}
+    volumes:
+      - type: bind
+        source: ${DRAMA_STORAGE_ROOT:-./.local/data/media}
+        target: /app/data/media
+    ports:
+      - "127.0.0.1:${DRAMA_HTTP_PORT:-18080}:18080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    stop_grace_period: 40s
+    restart: unless-stopped
+
+  web:
+    profiles: [web]
+    image: drama-foundation-web:local
+    build:
+      context: ./frontend
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /data:uid=10001,gid=10001,mode=0700
+      - /config:uid=10001,gid=10001,mode=0700
+      - /tmp:uid=10001,gid=10001,mode=0700
+    environment:
+      DRAMA_API_UPSTREAM: api:18080
+    ports:
+      - "127.0.0.1:${DRAMA_WEB_PORT:-15174}:8080"
+    depends_on:
+      api:
+        condition: service_started
+    logging: *logging
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
