@@ -158,7 +158,7 @@ async function createWorkspace() {
             <p class="muted small">每一个好故事，都从这里开始。</p>
           </div>
           <div class="heading-actions">
-            <label class="search-field"
+            <label class="search-field input-surface"
               ><UiIcon name="search" :size="18" /><input
                 v-model="query"
                 placeholder="搜索项目"

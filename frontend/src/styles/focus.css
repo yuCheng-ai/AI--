@@ -1,0 +1,50 @@
+/* One focus treatment per field. Composites put it on their existing shell. */
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+:root :is(input, select, textarea, [contenteditable='true']):focus-visible {
+  outline: 1px solid var(--focus-border);
+  outline-offset: -1px;
+}
+
+.input-surface {
+  transition: border-color 0.16s;
+}
+.input-surface:has(:is(input, textarea):focus-visible) {
+  border-color: var(--focus-border);
+}
+:root .input-surface :is(input, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Large documents use a quiet edge marker instead of a box around the page. */
+.editor-surface:has(:is(textarea, [contenteditable='true']):focus-visible) {
+  box-shadow: inset 2px 0 var(--focus-border);
+}
+:root .editor-surface :is(textarea, [contenteditable='true']):focus-visible {
+  outline: none;
+}
+
+/* Inline names stay visually part of their heading while being edited. */
+:root input.inline-input:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -1px var(--focus-border);
+}
+
+@media (forced-colors: active) {
+  :root {
+    --focus-border: Highlight;
+    --focus-ring: Highlight;
+  }
+  .input-surface:has(:is(input, textarea):focus-visible),
+  .editor-surface:has(:is(textarea, [contenteditable='true']):focus-visible),
+  :root input.inline-input:focus-visible {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+}

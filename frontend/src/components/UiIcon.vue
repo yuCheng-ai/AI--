@@ -52,6 +52,17 @@ import {
   PhUploadSimple,
   PhCaretLeft,
   PhCaretRight,
+  PhCursor,
+  PhHand,
+  PhMapTrifold,
+  PhMagnet,
+  PhFlowArrow,
+  PhKeyboard,
+  PhWaveform,
+  PhClockCounterClockwise,
+  PhLink,
+  PhSlidersHorizontal,
+  PhSelectionAll,
 } from '@phosphor-icons/vue';
 defineProps<{ name: string; size?: number; weight?: 'regular' | 'light' | 'fill' | 'bold' }>();
 const icons: Record<string, Component> = {
@@ -106,6 +117,17 @@ const icons: Record<string, Component> = {
   upload: PhUploadSimple,
   previous: PhCaretLeft,
   next: PhCaretRight,
+  cursor: PhCursor,
+  hand: PhHand,
+  map: PhMapTrifold,
+  magnet: PhMagnet,
+  flow: PhFlowArrow,
+  keyboard: PhKeyboard,
+  waveform: PhWaveform,
+  history: PhClockCounterClockwise,
+  link: PhLink,
+  settings: PhSlidersHorizontal,
+  selectAll: PhSelectionAll,
 };
 </script>
 <template>

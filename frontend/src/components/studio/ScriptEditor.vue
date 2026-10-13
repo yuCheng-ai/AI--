@@ -140,7 +140,7 @@ onBeforeUnmount(() => editor.value?.destroy());
         @change="importFile"
       />
     </div>
-    <div class="script-scroll"><EditorContent :editor="editor" /></div>
+    <div class="script-scroll editor-surface"><EditorContent :editor="editor" /></div>
     <footer class="editor-footer">
       <slot name="status" /><button
         class="primary"

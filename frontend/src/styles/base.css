@@ -61,15 +61,6 @@ h3 {
   font-size: 17px;
   font-weight: 550;
 }
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[contenteditable]:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-}
 button,
 input,
 select,
@@ -457,12 +448,6 @@ fieldset legend span {
   background: none;
   width: 160px;
   font-size: 13px;
-}
-.search-field input:focus-visible {
-  outline: 0;
-}
-.search-field:focus-within {
-  border-color: var(--accent);
 }
 .view-switch {
   display: flex;
@@ -957,7 +942,6 @@ fieldset legend span {
   font-size: 20px;
   line-height: 1.95;
   color: #e4e6e5;
-  outline: 0 !important;
   min-height: 100%;
 }
 .tiptap > * {
@@ -1164,9 +1148,6 @@ fieldset legend span {
   border-radius: 20px;
   padding: 18px 18px 15px;
   margin-top: 20px;
-}
-.agent-composer:focus-within {
-  border-color: #666562;
 }
 .agent-composer textarea {
   height: 72px;
@@ -1749,130 +1730,6 @@ fieldset legend span {
 .media-preview audio {
   width: 100%;
 }
-.canvas-page {
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
-.canvas-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px 38px;
-  border-bottom: 1px solid var(--line-soft);
-  gap: 20px;
-}
-.canvas-heading > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-.canvas-heading h1 {
-  font-size: 21px;
-}
-.canvas-viewport {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  position: relative;
-  background: #111415;
-}
-.canvas-surface {
-  position: relative;
-  width: 2400px;
-  height: 1600px;
-  transform-origin: top left;
-}
-.canvas-node {
-  position: absolute;
-  width: 310px;
-  border: 1px solid #414d51;
-  border-radius: 12px;
-  background: #1e2427;
-  box-shadow: 0 5px 20px #0003;
-  overflow: hidden;
-}
-.canvas-node header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #343f43;
-  color: #87979d;
-  cursor: grab;
-  touch-action: none;
-}
-.canvas-node header:active {
-  cursor: grabbing;
-}
-.canvas-node input {
-  border: 0;
-  padding: 4px;
-  color: #dbe0e0;
-  width: 150px;
-  font-size: 13px;
-}
-.node-type {
-  font-size: 10px;
-  color: #8b9b9f;
-  margin-left: auto;
-}
-.canvas-node textarea {
-  border: 0;
-  padding: 18px;
-  width: 100%;
-  min-height: 160px;
-  font-size: 14px;
-  line-height: 1.8;
-  resize: vertical;
-  outline-offset: -3px;
-}
-.canvas-empty {
-  position: absolute;
-  top: 23%;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 14px;
-  color: var(--muted);
-  text-align: center;
-  pointer-events: none;
-}
-.canvas-empty h2 {
-  font-size: 24px;
-  color: var(--text);
-}
-.canvas-empty > svg {
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-.canvas-empty p {
-  font-size: 14px;
-}
-.canvas-empty button {
-  pointer-events: auto;
-  margin-top: 12px;
-}
-.canvas-zoom {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 5px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #252b2d;
-}
-.canvas-zoom .text-button {
-  font-size: 12px;
-  min-width: 40px;
-}
-
 @media (min-width: 1650px) {
   .studio-header {
     gap: 32px;
@@ -2215,11 +2072,6 @@ fieldset legend span {
   }
   .brand {
     font-size: 19px;
-  }
-  .canvas-heading > div:first-child {
-    flex-direction: column;
-    gap: 2px;
-    align-items: flex-start;
   }
 }
 @media (max-width: 680px) {
@@ -2593,25 +2445,6 @@ fieldset legend span {
   }
   .dialog > header {
     padding: 16px 20px;
-  }
-  .canvas-heading {
-    padding: 20px;
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .canvas-heading .row-actions {
-    align-self: flex-end;
-  }
-  .canvas-heading .quiet-button,
-  .canvas-heading .text-button {
-    font-size: 12px;
-  }
-  .canvas-empty {
-    top: 18%;
-    padding: 24px;
-  }
-  .canvas-empty h2 {
-    font-size: 21px;
   }
   .empty-state {
     padding: 24px;

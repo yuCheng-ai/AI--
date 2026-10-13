@@ -5,6 +5,7 @@ import { router } from './router';
 import { useAppStore } from './stores/app';
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/focus.css';
 
 const application = createApp(App);
 application.use(createPinia());

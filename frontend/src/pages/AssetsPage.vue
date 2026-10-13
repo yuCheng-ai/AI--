@@ -73,7 +73,7 @@ async function upload(event: Event) {
           <p class="muted small">让灵感与画面，有迹可循。</p>
         </div>
         <div class="heading-actions">
-          <label class="search-field"
+          <label class="search-field input-surface"
             ><UiIcon name="search" :size="18" /><input
               v-model="search"
               aria-label="搜索素材"

@@ -112,7 +112,7 @@ async function attach(event: Event) {
         </div>
       </article>
     </div>
-    <form class="agent-composer" @submit.prevent="send">
+    <form class="agent-composer input-surface" @submit.prevent="send">
       <textarea
         v-model="prompt"
         aria-label="给智能体的想法"
